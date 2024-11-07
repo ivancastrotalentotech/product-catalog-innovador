@@ -1,0 +1,7 @@
+{
+    "products": [
+        { "id": 1, "nombre": "Smartphone XYZ", "descripcion": "Último modelo con cámara de alta resolución", "precio": 599.99, "categoria": "Electrónica", "imagen": "https://picsum.photos/seed/phone/300/200" },
+        { "id": 2, "nombre": "Zapatillas Deportivas", "descripcion": "Ideales para correr, máxima comodidad", "precio": 89.99, "categoria": "Deportes", "imagen": "https://picsum.photos/seed/shoes/300/200" },
+        { "id": 3, "nombre": "Libro Best Seller", "descripcion": "Novela de suspenso que no podrás soltar", "precio": 24.99, "categoria": "Libros", "imagen": "https://picsum.photos/seed/book/300/200" }
+      ]
+  }
