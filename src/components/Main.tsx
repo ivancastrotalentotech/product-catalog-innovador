@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, Search } from 'lucide-react'
-import data from '../assets/data/data.json';
+import clienteAxios from '../config/axios';
+
+// import data from '../assets/data/data.json';
 
 interface Producto {
   id: number
@@ -18,10 +20,29 @@ interface Producto {
 
 
 const Main = () => {
-  const [productos, setProductos] = useState<Producto[]>(data.products)
+  const [productos, setProductos] = useState<Producto[]>([])
   const [productoEditando, setProductoEditando] = useState<Producto | null>(null) 
   const [terminoBusqueda, setTerminoBusqueda] = useState('')
   const [productosFiltrados, setProductosFiltrados] = useState<Producto[]>([])
+
+
+  const consultarApi = async () =>{
+    try {
+      const { data } = await  clienteAxios.get(`producto`);
+      console.log(data)
+      setProductos(data.data); 
+    } catch (error) {
+      console.error('Error:', error);
+      setProductos([]);
+    }
+  };
+
+  //  aqui vamos a consultar la base de datos de productos cada vez que el component cargue (Main - useEffect) 
+  useEffect(() => {
+      // ejecutara una accion 
+      consultarApi(); 
+  }, []) 
+
 
   useEffect(() => {
      const resultadosFiltrados = productos.filter(producto =>
@@ -55,7 +76,18 @@ const Main = () => {
     form.reset()
   }
 
-  const handleEditar = (producto: Producto) => {
+  const handleEditar  = async (producto: Producto) => {
+
+    try {
+      const {  id } = producto;
+      const { data } = await  clienteAxios.patch(`producto/${id}`);
+      console.log("handleEditar: ", data)      
+      setProductoEditando(producto)
+    } catch (error) {
+      console.error('Error:', error);
+      setProductoEditando(producto)
+    }
+
     setProductoEditando(producto)
   }
 
@@ -142,7 +174,7 @@ const Main = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 mb-2">{producto.descripcion}</p>
-              <p className="font-semibold text-lg text-blue-600">${producto.precio.toFixed(2)}</p>
+              <p className="font-semibold text-lg text-blue-600">${+producto.precio}</p>
               <p className="text-sm text-gray-500">Categoría: {producto.categoria}</p>
               <div className="mt-4 space-x-2">
                 <Button variant="outline" onClick={() => handleEditar(producto)}>
