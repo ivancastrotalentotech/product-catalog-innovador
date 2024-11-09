@@ -29,7 +29,6 @@ const Main = () => {
   const consultarApi = async () =>{
     try {
       const { data } = await  clienteAxios.get(`producto`);
-      console.log(data)
       setProductos(data.data); 
     } catch (error) {
       console.error('Error:', error);
@@ -51,11 +50,12 @@ const Main = () => {
        producto.categoria.toLowerCase().includes(terminoBusqueda.toLowerCase())
      )
      setProductosFiltrados(resultadosFiltrados)
-   }, [terminoBusqueda, productos]) 
+  }, [terminoBusqueda, productos]) 
  
-   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
+
     const formData = new FormData(form)
     const nuevoProducto = {
       id: productoEditando ? productoEditando.id : Date.now(),
@@ -67,9 +67,24 @@ const Main = () => {
     }
 
     if (productoEditando) {
-      setProductos(productos.map(p => p.id === productoEditando.id ? nuevoProducto : p))
+      try {
+        const {  id } = productoEditando;
+        const { data } = await  clienteAxios.patch(`producto/${id}`, nuevoProducto);
+        console.log("handleEditar: ", data)  
+        await consultarApi();
+      } catch (error) {
+        console.error('Error:', error);
+        await consultarApi();
+      }
     } else {
-      setProductos([...productos, nuevoProducto])
+      try {
+        const { data } = await  clienteAxios.post(`producto`, nuevoProducto);
+        console.log("handleCrear: ", data)  
+        await consultarApi();
+      } catch (error) {
+        console.error('Error:', error);
+        await consultarApi();
+      }
     }
 
     setProductoEditando(null)
@@ -77,22 +92,18 @@ const Main = () => {
   }
 
   const handleEditar  = async (producto: Producto) => {
-
-    try {
-      const {  id } = producto;
-      const { data } = await  clienteAxios.patch(`producto/${id}`);
-      console.log("handleEditar: ", data)      
-      setProductoEditando(producto)
-    } catch (error) {
-      console.error('Error:', error);
-      setProductoEditando(producto)
-    }
-
     setProductoEditando(producto)
   }
 
-  const handleEliminar = (id: number) => {
-    setProductos(productos.filter(p => p.id !== id))
+  const handleEliminar = async (id: number) => {
+    try {
+      const { data } = await  clienteAxios.delete(`producto/${id}`);
+      console.log("handleEliminar: ", data)  
+      await consultarApi();
+    } catch (error) {
+      console.error('Error:', error);
+      await consultarApi();
+    }
   }
 
   const handleBusqueda = (e: React.ChangeEvent<HTMLInputElement>) => {
